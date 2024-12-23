@@ -38,21 +38,21 @@ const mockHalls: Hall[] = [
     name: "Main Auditorium",
     capacity: 500,
     available: true,
-    image: "/images/auditorium1.jpg",
+    image: "/images/img1.jpg",
   },
   {
     id: "2",
     name: "Conference Room A",
     capacity: 100,
     available: true,
-    image: "/images/conference_room_a.jpg",
+    image: "/images/img2.jpg",
   },
   {
     id: "3",
     name: "Seminar Hall B",
     capacity: 200,
     available: false,
-    image: "/images/seminar_hall_b.jpg",
+    image: "/images/img3.jpg",
   },
 ];
 
