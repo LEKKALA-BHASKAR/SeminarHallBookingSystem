@@ -19,6 +19,7 @@ type Hall = {
   name: string;
   capacity: number;
   available: boolean;
+  image: string; // Added image property
 };
 
 type Booking = {
@@ -37,18 +38,21 @@ const mockHalls: Hall[] = [
     name: "Main Auditorium",
     capacity: 500,
     available: true,
+    image: "/images/auditorium1.jpg",
   },
   {
     id: "2",
     name: "Conference Room A",
     capacity: 100,
     available: true,
+    image: "/images/conference_room_a.jpg",
   },
   {
     id: "3",
     name: "Seminar Hall B",
     capacity: 200,
     available: false,
+    image: "/images/seminar_hall_b.jpg",
   },
 ];
 
@@ -146,7 +150,7 @@ const DepartmentDashboard = () => {
             <CardDescription>Select a hall to make a booking</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {mockHalls.map((hall) => (
                 <div
                   key={hall.id}
@@ -157,7 +161,12 @@ const DepartmentDashboard = () => {
                   } ${!hall.available && "opacity-50"}`}
                   onClick={() => hall.available && setSelectedHall(hall.id)}
                 >
-                  <h3 className="font-medium">{hall.name}</h3>
+                  <img
+                    src={hall.image}
+                    alt={hall.name}
+                    className="w-full h-32 object-cover rounded-md"
+                  />
+                  <h3 className="font-medium mt-2">{hall.name}</h3>
                   <p className="text-sm text-gray-500">
                     Capacity: {hall.capacity} people
                   </p>
