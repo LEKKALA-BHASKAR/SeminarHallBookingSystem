@@ -1,42 +1,94 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+    height: 6em;
+    padding: 1.5em;
+    will-change: filter;
+    transition: filter 300ms;
 }
+
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+    filter: drop-shadow(0 0 2em var(--primary));
 }
+
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+    filter: drop-shadow(0 0 2em var(--secondary));
 }
 
 @keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+    a:nth-of-type(2) .logo {
+        animation: logo-spin infinite 20s linear;
+    }
 }
 
 .card {
-  padding: 2em;
+    padding: 2em;
+    background: var(--background);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 300ms ease, box-shadow 300ms ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.button {
+    padding: 0.8em 1.5em;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    transition: transform 200ms ease, background 300ms ease;
+}
+
+.button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(45deg, var(--secondary), var(--primary));
 }
 
 .read-the-docs {
-  color: #888;
+    color: var(--gray);
+    font-size: 0.9em;
+    text-decoration: none;
+    transition: color 300ms ease;
+}
+
+.read-the-docs:hover {
+    color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    #root {
+        padding: 1rem;
+        text-align: left;
+    }
+
+    .card {
+        padding: 1.5em;
+    }
+}
+
+:root {
+    --primary: #646cff;
+    --secondary: #61dafb;
+    --gray: #888;
+    --background: #f9f9f9;
 }
