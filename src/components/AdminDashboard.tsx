@@ -96,23 +96,33 @@ const AdminDashboard = () => {
 
   const renderBadge = (status: "pending" | "approved" | "rejected") => {
     const variants = {
-      approved: "secondary",
-      rejected: "destructive",
-      pending: "default",
+      approved: "bg-green-100 text-green-800",
+      rejected: "bg-red-100 text-red-800",
+      pending: "bg-yellow-100 text-yellow-800",
     };
-    return <Badge variant={variants[status]}>{status}</Badge>;
+    return (
+      <Badge
+        className={`px-3 py-1 rounded-lg text-sm font-medium ${variants[status]}`}
+      >
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </Badge>
+    );
   };
 
   const renderActions = (status: string, id: string) => {
     if (status === "pending") {
       return (
         <div className="flex space-x-2">
-          <Button size="sm" onClick={() => handleStatusUpdate(id, "approved")}>
+          <Button
+            size="sm"
+            className="bg-green-500 text-white hover:bg-green-600"
+            onClick={() => handleStatusUpdate(id, "approved")}
+          >
             Approve
           </Button>
           <Button
             size="sm"
-            variant="destructive"
+            className="bg-red-500 text-white hover:bg-red-600"
             onClick={() => handleStatusUpdate(id, "rejected")}
           >
             Reject
@@ -124,17 +134,19 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 p-6 bg-gray-50 min-h-screen">
       {/* Department Management */}
-      <Card>
+      <Card className="shadow-lg border border-gray-200">
         <CardHeader>
-          <CardTitle>Department Management</CardTitle>
-          <CardDescription>View and manage registered departments</CardDescription>
+          <CardTitle className="text-xl font-bold">Department Management</CardTitle>
+          <CardDescription className="text-gray-600">
+            View and manage registered departments
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
+          <Table className="w-full border border-gray-200">
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-gray-100">
                 <TableHead>Department Name</TableHead>
                 <TableHead>Contact Person</TableHead>
                 <TableHead>Email</TableHead>
@@ -142,7 +154,10 @@ const AdminDashboard = () => {
             </TableHeader>
             <TableBody>
               {departments.map((dept) => (
-                <TableRow key={dept.id}>
+                <TableRow
+                  key={dept.id}
+                  className="hover:bg-gray-50 transition"
+                >
                   <TableCell>{dept.name}</TableCell>
                   <TableCell>{dept.contactPerson}</TableCell>
                   <TableCell>{dept.email}</TableCell>
@@ -154,15 +169,17 @@ const AdminDashboard = () => {
       </Card>
 
       {/* Booking Requests */}
-      <Card>
+      <Card className="shadow-lg border border-gray-200">
         <CardHeader>
-          <CardTitle>Booking Requests</CardTitle>
-          <CardDescription>Manage seminar hall booking requests</CardDescription>
+          <CardTitle className="text-xl font-bold">Booking Requests</CardTitle>
+          <CardDescription className="text-gray-600">
+            Manage seminar hall booking requests
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
+          <Table className="w-full border border-gray-200">
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-gray-100">
                 <TableHead>Hall</TableHead>
                 <TableHead>Department</TableHead>
                 <TableHead>Date</TableHead>
@@ -174,7 +191,10 @@ const AdminDashboard = () => {
             </TableHeader>
             <TableBody>
               {bookings.map((booking) => (
-                <TableRow key={booking.id}>
+                <TableRow
+                  key={booking.id}
+                  className="hover:bg-gray-50 transition"
+                >
                   <TableCell>{booking.hallName}</TableCell>
                   <TableCell>{booking.department}</TableCell>
                   <TableCell>{booking.date}</TableCell>
