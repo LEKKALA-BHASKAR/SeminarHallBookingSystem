@@ -115,6 +115,5 @@ export default function AdminRegister() {
         </div>
       </div>
     </div>
-  </div>
   );
 }
