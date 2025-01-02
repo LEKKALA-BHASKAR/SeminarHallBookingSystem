@@ -12,7 +12,7 @@ type User = {
 type AuthContextType = {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string, department: string) => Promise<void>;
+  register: (email: string, password: string, name: string, department: string, role?: "admin" | "department") => Promise<void>;
   logout: () => Promise<void>;
   isLoading: boolean;
 };
@@ -97,7 +97,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error('No user data returned');
       }
 
-      // Fetch user profile after successful login
       await fetchUserProfile(data.user.id);
     } catch (error: any) {
       console.error('Login error:', error);
@@ -105,7 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const register = async (email: string, password: string, name: string, department: string) => {
+  const register = async (email: string, password: string, name: string, department: string, role: "admin" | "department" = "department") => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -113,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         options: {
           data: {
             name,
-            role: 'department',
+            role,
             department,
           },
         },
