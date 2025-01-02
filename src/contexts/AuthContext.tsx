@@ -81,24 +81,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (error) throw error;
+
+      if (error) {
+        if (error.message === 'Invalid login credentials') {
+          throw new Error('Invalid email or password');
+        }
+        throw error;
+      }
+
+      if (!data.user) {
+        throw new Error('No user data returned');
+      }
+
+      // Fetch user profile after successful login
+      await fetchUserProfile(data.user.id);
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to sign in",
-        variant: "destructive",
-      });
+      console.error('Login error:', error);
       throw error;
     }
   };
 
   const register = async (email: string, password: string, name: string, department: string) => {
     try {
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -110,18 +119,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
       });
 
-      if (signUpError) throw signUpError;
+      if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "Registration successful! Please check your email to verify your account.",
-      });
+      if (data) {
+        toast({
+          title: "Success",
+          description: "Registration successful! Please check your email to verify your account.",
+        });
+      }
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to register",
-        variant: "destructive",
-      });
+      console.error('Registration error:', error);
       throw error;
     }
   };
@@ -130,12 +137,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      setUser(null);
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to sign out",
-        variant: "destructive",
-      });
+      console.error('Logout error:', error);
       throw error;
     }
   };
