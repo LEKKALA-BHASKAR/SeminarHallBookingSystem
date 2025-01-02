@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 type Booking = {
   id: string;
@@ -74,7 +74,7 @@ const BookingTable = () => {
   });
 
   const renderBadge = (status: "pending" | "approved" | "rejected") => {
-    const variants = {
+    const variants: Record<typeof status, "default" | "secondary" | "destructive"> = {
       approved: "secondary",
       rejected: "destructive",
       pending: "default",
