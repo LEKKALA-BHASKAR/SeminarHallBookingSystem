@@ -13,77 +13,90 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 type Hall = {
   id: string;
   name: string;
   capacity: number;
   available: boolean;
-  image: string; // Added image property
+  image: string;
 };
 
 type Booking = {
   id: string;
-  hallName: string;
+  hall_name: string;
   date: string;
   status: "pending" | "approved" | "rejected";
-  purpose: string;
-  attendees: number;
+  purpose?: string;
+  attendees?: number;
 };
 
-// Mock data for demonstration
-const mockHalls: Hall[] = [
-  {
-    id: "1",
-    name: "Main Auditorium",
-    capacity: 500,
-    available: true,
-    image: "/images/img1.jpg",
-  },
-  {
-    id: "2",
-    name: "Conference Room A",
-    capacity: 100,
-    available: true,
-    image: "/images/img2.jpg",
-  },
-  {
-    id: "3",
-    name: "Seminar Hall B",
-    capacity: 200,
-    available: false,
-    image: "/images/img3.jpg",
-  },
-];
+const fetchHalls = async () => {
+  const { data, error } = await supabase.from("halls").select("*");
+  if (error) throw error;
+  return data as Hall[];
+};
 
-const mockBookings: Booking[] = [
-  {
-    id: "1",
-    hallName: "Main Auditorium",
-    date: "2024-03-20",
-    status: "pending",
-    purpose: "Technical Seminar",
-    attendees: 200,
-  },
-  {
-    id: "2",
-    hallName: "Conference Room A",
-    date: "2024-03-15",
-    status: "approved",
-    purpose: "Department Meeting",
-    attendees: 50,
-  },
-];
+const fetchUserBookings = async (department: string) => {
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("*")
+    .eq("department", department)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data as Booking[];
+};
 
 const DepartmentDashboard = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedHall, setSelectedHall] = useState<string | null>(null);
-  const [bookings] = useState<Booking[]>(mockBookings);
   const { toast } = useToast();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  const { data: halls = [] } = useQuery({
+    queryKey: ["halls"],
+    queryFn: fetchHalls,
+  });
+
+  const { data: bookings = [] } = useQuery({
+    queryKey: ["bookings", user?.department],
+    queryFn: () => fetchUserBookings(user?.department || ""),
+    enabled: !!user?.department,
+  });
+
+  const createBooking = useMutation({
+    mutationFn: async (newBooking: {
+      hall_name: string;
+      date: string;
+      department: string;
+    }) => {
+      const { error } = await supabase.from("bookings").insert([newBooking]);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      toast({
+        title: "Success",
+        description: "Booking request submitted successfully",
+      });
+      setSelectedHall(null);
+      setSelectedDate(new Date());
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to submit booking request",
+        variant: "destructive",
+      });
+      console.error("Error creating booking:", error);
+    },
+  });
 
   const handleBooking = () => {
-    if (!selectedDate || !selectedHall) {
+    if (!selectedDate || !selectedHall || !user?.department) {
       toast({
         title: "Error",
         description: "Please select both a date and a hall",
@@ -92,9 +105,13 @@ const DepartmentDashboard = () => {
       return;
     }
 
-    toast({
-      title: "Success",
-      description: "Booking request submitted successfully",
+    const selectedHallData = halls.find((h) => h.id === selectedHall);
+    if (!selectedHallData) return;
+
+    createBooking.mutate({
+      hall_name: selectedHallData.name,
+      date: selectedDate.toISOString().split("T")[0],
+      department: user.department,
     });
   };
 
@@ -111,18 +128,14 @@ const DepartmentDashboard = () => {
               <TableRow>
                 <TableHead>Hall</TableHead>
                 <TableHead>Date</TableHead>
-                <TableHead>Purpose</TableHead>
-                <TableHead>Attendees</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {bookings.map((booking) => (
                 <TableRow key={booking.id}>
-                  <TableCell>{booking.hallName}</TableCell>
+                  <TableCell>{booking.hall_name}</TableCell>
                   <TableCell>{booking.date}</TableCell>
-                  <TableCell>{booking.purpose}</TableCell>
-                  <TableCell>{booking.attendees}</TableCell>
                   <TableCell>
                     <Badge
                       variant={
@@ -151,7 +164,7 @@ const DepartmentDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {mockHalls.map((hall) => (
+              {halls.map((hall) => (
                 <div
                   key={hall.id}
                   className={`p-4 border rounded-lg cursor-pointer ${
