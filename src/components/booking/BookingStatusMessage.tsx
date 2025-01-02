@@ -14,7 +14,7 @@ export const BookingStatusMessage = ({ status }: BookingStatusMessageProps) => {
             Pending
           </Badge>
           <p className="text-sm text-yellow-800">
-            Bhaskar will confirm your booking
+            Admin Bhaskar will confirm your booking wait 2-24 hrs
           </p>
         </div>
       </Card>
