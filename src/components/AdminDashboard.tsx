@@ -29,7 +29,7 @@ const AdminDashboard = () => {
         <CardHeader>
           <CardTitle className="text-xl font-bold">Booking Requests</CardTitle>
           <CardDescription className="text-gray-600">
-            Manage seminar hall booking requests
+           Bhaskar Manage seminar hall booking requests
           </CardDescription>
         </CardHeader>
         <CardContent>
