@@ -8,21 +8,28 @@ import { useToast } from "@/components/ui/use-toast";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       await login(email, password);
       navigate("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Login error:", error);
       toast({
         title: "Error",
-        description: "Invalid credentials. Please try again.",
+        description: error.message === "Invalid login credentials" 
+          ? "Invalid email or password. Please try again." 
+          : "An error occurred during login. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -52,6 +59,7 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email address"
                 className="focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                disabled={isLoading}
               />
             </div>
             <div className="animate-slide-in">
@@ -67,13 +75,18 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
                 className="focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                disabled={isLoading}
               />
             </div>
           </div>
 
           <div className="animate-bounce-in">
-            <Button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white transition-all">
-              Sign in
+            <Button 
+              type="submit" 
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white transition-all"
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing in..." : "Sign in"}
             </Button>
           </div>
         </form>
@@ -86,5 +99,3 @@ export default function Login() {
     </div>
   );
 }
-
-
