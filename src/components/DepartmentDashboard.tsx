@@ -2,19 +2,12 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { BookingsTable } from "./booking/BookingsTable";
+import { HallSelection } from "./booking/HallSelection";
 
 type Hall = {
   id: string;
@@ -29,8 +22,6 @@ type Booking = {
   hall_name: string;
   date: string;
   status: "pending" | "approved" | "rejected";
-  purpose?: string;
-  attendees?: number;
 };
 
 const fetchHalls = async () => {
@@ -123,73 +114,17 @@ const DepartmentDashboard = () => {
           <CardDescription>View your booking history and current requests</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Hall</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {bookings.map((booking) => (
-                <TableRow key={booking.id}>
-                  <TableCell>{booking.hall_name}</TableCell>
-                  <TableCell>{booking.date}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        booking.status === "approved"
-                          ? "secondary"
-                          : booking.status === "rejected"
-                          ? "destructive"
-                          : "default"
-                      }
-                    >
-                      {booking.status}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <BookingsTable bookings={bookings} />
         </CardContent>
       </Card>
 
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle>Available Halls</CardTitle>
-            <CardDescription>Select a hall to make a booking</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {halls.map((hall) => (
-                <div
-                  key={hall.id}
-                  className={`p-4 border rounded-lg cursor-pointer ${
-                    selectedHall === hall.id
-                      ? "border-primary bg-primary/5"
-                      : "hover:border-primary/50"
-                  } ${!hall.available && "opacity-50"}`}
-                  onClick={() => hall.available && setSelectedHall(hall.id)}
-                >
-                  <img
-                    src={hall.image}
-                    alt={hall.name}
-                    className="w-full h-32 object-cover rounded-md"
-                  />
-                  <h3 className="font-medium mt-2">{hall.name}</h3>
-                  <p className="text-sm text-gray-500">
-                    Capacity: {hall.capacity} people
-                  </p>
-                  <Badge variant={hall.available ? "outline" : "secondary"}>
-                    {hall.available ? "Available" : "Booked"}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
+          <HallSelection
+            halls={halls}
+            selectedHall={selectedHall}
+            onSelectHall={setSelectedHall}
+          />
         </Card>
 
         <Card>
