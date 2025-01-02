@@ -57,7 +57,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching profile:', error);
+        throw error;
+      }
 
       if (data) {
         setUser({
@@ -87,17 +90,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) {
-        if (error.message === 'Invalid login credentials') {
-          throw new Error('Invalid email or password');
+        console.error('Login error:', error);
+        let errorMessage = 'Invalid email or password';
+        if (error.message.includes('Database error')) {
+          errorMessage = 'System error. Please try again in a few moments.';
         }
-        throw error;
+        throw new Error(errorMessage);
       }
 
       if (!data.user) {
         throw new Error('No user data returned');
       }
 
-      await fetchUserProfile(data.user.id);
+      // Don't need to call fetchUserProfile here as it will be triggered by onAuthStateChange
     } catch (error: any) {
       console.error('Login error:', error);
       throw error;
