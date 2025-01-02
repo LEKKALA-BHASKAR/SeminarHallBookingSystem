@@ -15,15 +15,34 @@ export default function Register() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const validatePassword = (password: string) => {
+    if (password.length < 6) {
+      return "Password must be at least 6 characters long";
+    }
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate password before submission
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      toast({
+        title: "Validation Error",
+        description: passwordError,
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       await register(email, password, name, department);
       navigate("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Registration failed. Please try again.",
+        description: error.message || "Registration failed. Please try again.",
         variant: "destructive",
       });
     }
@@ -88,7 +107,11 @@ export default function Register() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
+                minLength={6}
               />
+              <p className="text-sm text-gray-500 mt-1">
+                Password must be at least 6 characters long
+              </p>
             </div>
           </div>
 
