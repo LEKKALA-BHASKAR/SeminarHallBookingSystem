@@ -91,11 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error('Login error:', error);
-        let errorMessage = 'Invalid email or password';
-        if (error.message.includes('Database error')) {
-          errorMessage = 'System error. Please try again in a few moments.';
-        }
-        throw new Error(errorMessage);
+        throw new Error('Invalid email or password');
       }
 
       if (!data.user) {
@@ -111,17 +107,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (email: string, password: string, name: string, department: string, role: "admin" | "department" = "department") => {
     try {
-      // First, check if the email is already registered
-      const { data: existingUser } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email)
-        .single();
-
-      if (existingUser) {
-        throw new Error('Email already registered');
-      }
-
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -138,9 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error('Registration error:', error);
         let errorMessage = 'Registration failed';
         
-        if (error.message.includes('Database error')) {
-          errorMessage = 'System error. Please try again in a few moments.';
-        } else if (error.message.includes('User already registered')) {
+        if (error.message.includes('User already registered')) {
           errorMessage = 'Email already registered';
         }
         
