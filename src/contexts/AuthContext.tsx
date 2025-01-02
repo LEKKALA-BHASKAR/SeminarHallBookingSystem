@@ -62,9 +62,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data) {
         setUser({
           id: data.id,
-          name: data.name,
-          role: data.role,
-          department: data.department,
+          name: data.name || '',
+          role: data.role as "admin" | "department",
+          department: data.department || undefined,
         });
       }
     } catch (error) {
@@ -80,7 +80,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const login = async (email: string, password: string) => {
-    setIsLoading(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -94,15 +93,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         variant: "destructive",
       });
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const register = async (email: string, password: string, name: string, department: string) => {
-    setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -113,7 +109,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           },
         },
       });
-      if (error) throw error;
+
+      if (signUpError) throw signUpError;
+
+      toast({
+        title: "Success",
+        description: "Registration successful! Please check your email to verify your account.",
+      });
     } catch (error: any) {
       toast({
         title: "Error",
@@ -121,8 +123,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         variant: "destructive",
       });
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
