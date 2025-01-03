@@ -1,3 +1,4 @@
+//type script not react make sure the file extension should be .jsx not .tsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
